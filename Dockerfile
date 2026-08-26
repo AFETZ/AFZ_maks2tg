@@ -1,18 +1,27 @@
-FROM python:3.12-slim AS builder
+ARG PYTHON_VERSION=3.12
 
-ENV MALLOC_ARENA_MAX=2
+FROM python:${PYTHON_VERSION}-slim AS builder
+
+WORKDIR /build
+
+COPY requirements.txt ./
+
+RUN python -m pip install \
+    --no-cache-dir \
+    --progress-bar off \
+    --prefix=/install \
+    -r requirements.txt
+
+FROM python:${PYTHON_VERSION}-slim AS runtime
+
+ENV MALLOC_ARENA_MAX=2 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir --progress-bar off -r requirements.txt
+COPY --from=builder /install /usr/local
 
-FROM python:3.12-alpine
-
-WORKDIR /app
-
-COPY --from=builder /usr/local/lib/python3.12/site-packages/ /usr/local/lib/python3.12/site-packages/
-
-COPY . .
+COPY app/ ./app/
 
 CMD ["python", "-m", "app.main"]
