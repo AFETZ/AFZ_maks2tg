@@ -3,6 +3,10 @@ __pycache__/
 *.pyc
 .venv/
 debug/
+logs/
+.pytest_cache/
+.coverage
+htmlcov/
 .claude/
 *.code*
 *.cl*

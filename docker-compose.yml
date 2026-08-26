@@ -1,9 +1,9 @@
-version: '3.5'
-
 services:
   max2tg:
     build: .
+    network_mode: ${DOCKER_NETWORK_MODE:-bridge}
     restart: unless-stopped
+    init: true
     environment:
       MAX_TOKEN:
       MAX_DEVICE_ID:
@@ -19,6 +19,8 @@ services:
       LOG_DIR: /app/logs
     volumes:
       - ./logs:/app/logs
+    security_opt:
+      - no-new-privileges:true
     ulimits:
       nproc: 65535
       nofile:
